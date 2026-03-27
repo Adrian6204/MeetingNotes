@@ -57,18 +57,18 @@ export function parseChatGPTContent(text: string): Record<string, any> {
   };
 
   // 1. First, attempt to match specific patterns for our standard keys
-  // Updated regex to handle labels that use TABS or SPACES instead of colons (e.g. "Time 10:00")
+  // Very robust regex for labels like "Record by: Name" or "Record by	Name"
   const sections = [
-    { key: 'title', patterns: [/Title\s*[:\t\s]+(.*)/i, /Subject\s*[:\t\s]+(.*)/i] },
-    { key: 'date', patterns: [/Date\s*[:\t\s]+(.*)/i] },
-    { key: 'time', patterns: [/Time\s*[:\t\s]+(.*)/i] },
-    { key: 'venue', patterns: [/Venue\s*[:\t\s]+(.*)/i, /Location\s*[:\t\s]+(.*)/i] },
-    { key: 'attendees', patterns: [/Attendees\s*[:\t\s]+(.*)/i, /Participants\s*[:\t\s]+(.*)/i, /Participant\s*[:\t\s]+(.*)/i] },
-    { key: 'recorded_by', patterns: [/Record by\s*[:\t\s]+(.*)/i, /Recorded by\s*[:\t\s]+(.*)/i] },
-    { key: 'prepared_by', patterns: [/Prepared by\s*[:\t\s]+(.*)/i] },
-    { key: 'summary', patterns: [/Summary\s*[:\t\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i] },
-    { key: 'actions', patterns: [/Action Items\s*[:\t\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i, /Next Steps\s*[:\t\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i] },
-    { key: 'decisions', patterns: [/Decisions\s*[:\t\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i] },
+    { key: 'title', patterns: [/^Title\s*[:\s\t]+(.*)/im, /^Subject\s*[:\s\t]+(.*)/im] },
+    { key: 'date', patterns: [/^Date\s*[:\s\t]+(.*)/im] },
+    { key: 'time', patterns: [/^Time\s*[:\s\t]+(.*)/im] },
+    { key: 'venue', patterns: [/^Venue\s*[:\s\t]+(.*)/im, /^Location\s*[:\s\t]+(.*)/im] },
+    { key: 'attendees', patterns: [/^Attendees\s*[:\s\t]+(.*)/im, /^Participants\s*[:\s\t]+(.*)/im, /^Participant\s*[:\s\t]+(.*)/im] },
+    { key: 'recorded_by', patterns: [/^Record\s+by\s*[:\s\t]+(.*)/im, /^Recorded\s+by\s*[:\s\t]+(.*)/im] },
+    { key: 'prepared_by', patterns: [/^Prepared\s+by\s*[:\s\t]+(.*)/im] },
+    { key: 'summary', patterns: [/Summary\s*[:\s\t]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i] },
+    { key: 'actions', patterns: [/Action Items\s*[:\s\t]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i, /Next Steps\s*[:\s\t]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i] },
+    { key: 'decisions', patterns: [/Decisions\s*[:\s\t]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i] },
   ];
 
   sections.forEach(({ key, patterns }) => {
@@ -182,7 +182,14 @@ export function parseChatGPTContent(text: string): Record<string, any> {
     // Filter out rows that contain headers like "No." or "Agenda Item"
     const agendaLines = agendaSection[1].split('\n')
       .filter(line => !line.match(/No\.\s*Agenda Item/i) && line.trim().length > 0)
-      .map(line => line.trim().replace(/\t/g, ' ')); // Convert tabs to spaces for cleaner look
+      .map(line => {
+        let trimmed = line.trim().replace(/\t/g, ' ');
+        // If it starts with a number but no dot, add the dot (e.g. "1 Benchmarking" -> "1. Benchmarking")
+        if (trimmed.match(/^\d+\s+[A-Z]/)) {
+          trimmed = trimmed.replace(/^(\d+)\s+/, '$1. ');
+        }
+        return trimmed;
+      });
     
     agendaText = agendaLines.join('\n');
   }
