@@ -57,13 +57,18 @@ export function parseChatGPTContent(text: string): Record<string, any> {
   };
 
   // 1. First, attempt to match specific patterns for our standard keys
+  // Updated regex to handle labels that use TABS or SPACES instead of colons (e.g. "Time 10:00")
   const sections = [
-    { key: 'title', patterns: [/Title\s*:\s*(.*)/i, /Subject\s*:\s*(.*)/i] },
-    { key: 'date', patterns: [/Date\s*:\s*(.*)/i] },
-    { key: 'attendees', patterns: [/Attendees\s*:\s*(.*)/i, /Participants\s*:\s*(.*)/i] },
-    { key: 'summary', patterns: [/Summary\s*:\s*([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i] },
-    { key: 'actions', patterns: [/Action Items\s*:\s*([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i, /Next Steps\s*:\s*([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i] },
-    { key: 'decisions', patterns: [/Decisions\s*:\s*([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i] },
+    { key: 'title', patterns: [/Title\s*[:\t\s]+(.*)/i, /Subject\s*[:\t\s]+(.*)/i] },
+    { key: 'date', patterns: [/Date\s*[:\t\s]+(.*)/i] },
+    { key: 'time', patterns: [/Time\s*[:\t\s]+(.*)/i] },
+    { key: 'venue', patterns: [/Venue\s*[:\t\s]+(.*)/i, /Location\s*[:\t\s]+(.*)/i] },
+    { key: 'attendees', patterns: [/Attendees\s*[:\t\s]+(.*)/i, /Participants\s*[:\t\s]+(.*)/i, /Participant\s*[:\t\s]+(.*)/i] },
+    { key: 'recorded_by', patterns: [/Record by\s*[:\t\s]+(.*)/i, /Recorded by\s*[:\t\s]+(.*)/i] },
+    { key: 'prepared_by', patterns: [/Prepared by\s*[:\t\s]+(.*)/i] },
+    { key: 'summary', patterns: [/Summary\s*[:\t\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i] },
+    { key: 'actions', patterns: [/Action Items\s*[:\t\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i, /Next Steps\s*[:\t\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i] },
+    { key: 'decisions', patterns: [/Decisions\s*[:\t\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i] },
   ];
 
   sections.forEach(({ key, patterns }) => {
@@ -77,14 +82,14 @@ export function parseChatGPTContent(text: string): Record<string, any> {
   });
 
   // 2. NEW: Support ANY custom tag using "Key: Value" format
-  // This looks for lines like "Location: Office" and maps it to {{location}}
+  // We updated the regex to allow spaces in keys (e.g. "Record by: Name")
   const lines = text.split('\n');
   const customData: Record<string, any> = {};
 
   lines.forEach(line => {
-    const customMatch = line.match(/^([a-zA-Z0-9_]+)\s*:\s*(.*)$/);
+    const customMatch = line.match(/^([\w\s]+)\s*:\s*(.*)$/);
     if (customMatch) {
-      const key = customMatch[1].toLowerCase().trim();
+      const key = customMatch[1].toLowerCase().trim().replace(/\s+/g, '_');
       const value = customMatch[2].trim();
       customData[key] = value;
     }
@@ -170,11 +175,16 @@ export function parseChatGPTContent(text: string): Record<string, any> {
   data.task = followUpRows; // Match user's {#task} tag
   data.tasks = followUpRows; // Keep plural as fallback
 
-  // 4. AGENDA MAGIC: Extract the agenda section
+  // 4. AGENDA MAGIC: Extract and clean the agenda section
   let agendaText = '';
   const agendaSection = text.match(/Agenda\s*\n+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i);
   if (agendaSection && agendaSection[1]) {
-    agendaText = agendaSection[1].trim();
+    // Filter out rows that contain headers like "No." or "Agenda Item"
+    const agendaLines = agendaSection[1].split('\n')
+      .filter(line => !line.match(/No\.\s*Agenda Item/i) && line.trim().length > 0)
+      .map(line => line.trim().replace(/\t/g, ' ')); // Convert tabs to spaces for cleaner look
+    
+    agendaText = agendaLines.join('\n');
   }
   data.agenda = agendaText;
 
