@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Layers, Search, Bell, User } from 'lucide-react';
+import { Layers } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   return (
@@ -8,39 +8,39 @@ const Navbar: React.FC = () => {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="glass"
       style={{
         position: 'fixed',
-        top: '1.5rem',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: 'calc(100% - 3rem)',
-        maxWidth: '1200px',
+        top: '0',
+        left: '0',
+        width: '100%',
         height: '64px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 2rem',
+        padding: '0 4rem',
         zIndex: 1000,
+        background: 'rgba(8, 8, 8, 0.8)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid var(--border-color)'
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 700, fontSize: '1.25rem' }}>
-        <Layers size={24} color="var(--accent-color)" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 600, fontSize: '1.1rem', letterSpacing: '-0.02em' }}>
+        <div style={{ background: 'var(--accent-color)', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Layers size={18} color="white" />
+        </div>
         <span>MeetingNotes</span>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-        <a href="#" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>Features</a>
-        <a href="#" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>Templates</a>
-        <a href="#" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>Pricing</a>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
+        <a href="#" style={{ color: 'var(--secondary-fg)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500, transition: 'color 0.2s' }}>Platform</a>
+        <a href="#" style={{ color: 'var(--secondary-fg)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500, transition: 'color 0.2s' }}>Solutions</a>
+        <a href="#" style={{ color: 'var(--secondary-fg)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500, transition: 'color 0.2s' }}>Resources</a>
+        <a href="#" style={{ color: 'var(--secondary-fg)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500, transition: 'color 0.2s' }}>Pricing</a>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-        <Search size={20} style={{ opacity: 0.6, cursor: 'pointer' }} />
-        <Bell size={20} style={{ opacity: 0.6, cursor: 'pointer' }} />
-        <div style={{ height: '32px', width: '32px', background: 'var(--accent-color)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <User size={18} />
-        </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <button style={{ background: 'transparent', border: 'none', color: 'var(--secondary-fg)', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer' }}>Sign in</button>
+        <button style={{ background: 'var(--accent-color)', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer' }}>Get started</button>
       </div>
     </motion.nav>
   );
