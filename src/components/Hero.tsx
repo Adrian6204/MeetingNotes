@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
 
 const Hero: React.FC = () => {
   return (
@@ -20,25 +19,6 @@ const Hero: React.FC = () => {
         transition={{ duration: 0.8, delay: 0.2 }}
         style={{ textAlign: 'center', maxWidth: '1000px' }}
       >
-        <div style={{ 
-          display: 'inline-flex', 
-          alignItems: 'center', 
-          gap: '0.5rem', 
-          padding: '0.4rem 1rem', 
-          borderRadius: '100px',
-          marginBottom: '2.5rem',
-          fontSize: '0.8rem',
-          color: 'var(--accent-color)',
-          background: 'rgba(37, 99, 235, 0.1)',
-          border: '1px solid rgba(37, 99, 235, 0.2)',
-          fontWeight: 500
-        }}>
-          <span>v2.0 is live</span>
-          <div style={{ width: '1px', height: '12px', background: 'rgba(37, 99, 235, 0.3)' }} />
-          <span style={{ color: 'var(--secondary-fg)' }}>See what's new</span>
-          <ArrowRight size={14} />
-        </div>
-
         <h1 style={{ 
           fontSize: 'clamp(2.5rem, 6vw, 5rem)', 
           fontWeight: 700, 

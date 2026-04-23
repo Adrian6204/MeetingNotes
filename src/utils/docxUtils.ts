@@ -82,24 +82,36 @@ export function parseChatGPTContent(text: string): Record<string, any> {
   });
 
   // 2. NEW: Support ANY custom tag using "Key: Value" format
-  // We updated the regex to allow spaces in keys (e.g. "Record by: Name")
   const lines = text.split('\n');
   const customData: Record<string, any> = {};
 
   lines.forEach(line => {
     const customMatch = line.match(/^([\w\s]+)\s*:\s*(.*)$/);
     if (customMatch) {
-      const key = customMatch[1].toLowerCase().trim().replace(/\s+/g, '_');
+      const rawKey = customMatch[1].trim();
       const value = customMatch[2].trim();
-      customData[key] = value;
+      
+      // Store both underscored and spaced versions for maximum template compatibility
+      const underKey = rawKey.toLowerCase().replace(/\s+/g, '_');
+      const spaceKey = rawKey.toLowerCase();
+      
+      customData[underKey] = value;
+      customData[spaceKey] = value;
+      
+      // Specifically handle common template variants
+      if (spaceKey === 'record_by' || spaceKey === 'recorded_by' || spaceKey === 'record by') {
+        customData['recorded by'] = value;
+        customData['record by'] = value;
+      }
+      if (spaceKey === 'prepared_by' || spaceKey === 'prepared by') {
+        customData['prepared by'] = value;
+      }
     }
   });
 
   // Merge custom data into main data
   Object.keys(customData).forEach(key => {
-    if (!data[key] || (key !== 'title' && key !== 'date')) {
-      data[key] = customData[key];
-    }
+    data[key] = customData[key];
   });
 
   // 3. TABLE MAGIC: Extract rows for the {#notes} loop
