@@ -17,6 +17,7 @@
     "docxtemplater": "^3.68.3",
     "file-saver": "^2.0.5",
     "framer-motion": "^12.38.0",
+    "lenis": "^1.3.23",
     "lucide-react": "^1.7.0",
     "mammoth": "^1.12.0",
     "ogl": "^1.0.11",

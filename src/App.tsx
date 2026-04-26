@@ -1,11 +1,13 @@
 import Hero from './components/Hero';
 import MeetingMinutesGenerator from './components/MeetingMinutesGenerator';
 import ShadersBackground from './components/ui/background-shades';
+import SmoothScroll from './components/ui/SmoothScroll';
 import './styles/global.css';
 
 function App() {
   return (
-    <div className="app" style={{ minHeight: '100vh', position: 'relative' }}>
+    <SmoothScroll>
+      <div className="app" style={{ minHeight: '100vh', position: 'relative' }}>
       <div style={{ 
         position: 'fixed', 
         top: 0, 
@@ -22,7 +24,7 @@ function App() {
         <Hero />
         <MeetingMinutesGenerator />
       </div>
-    </div>
+    </SmoothScroll>
   );
 }
 
