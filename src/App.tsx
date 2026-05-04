@@ -24,6 +24,7 @@ function App() {
         <Hero />
         <MeetingMinutesGenerator />
       </div>
+    </div>
     </SmoothScroll>
   );
 }
